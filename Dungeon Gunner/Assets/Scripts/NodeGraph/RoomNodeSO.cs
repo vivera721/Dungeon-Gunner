@@ -19,6 +19,8 @@ public class RoomNodeSO : ScriptableObject
 #if UNITY_EDITOR
 
     [HideInInspector] public Rect rect;
+    [HideInInspector] public bool isLeftClickDragging = false;
+    [HideInInspector] public bool isSelected = false;
 
     /// <summary>
     /// Initialise node
@@ -84,6 +86,154 @@ public class RoomNodeSO : ScriptableObject
         }
 
         return roomArray;
+    }
+
+    /// <summary>
+    /// Process events for the node
+    /// </summary>
+    /// <param name="currentEvent"></param>
+    public void ProcessEvents(Event currentEvent)
+    {
+        switch (currentEvent.type)
+        {
+            // Process Mouse Down Events
+            case EventType.MouseDown:
+                ProcessMouseDownEvent(currentEvent);
+                break;
+            // Process Mouse Up Events
+            case EventType.MouseUp:
+                ProcessMouseUpEvent(currentEvent);
+                break;
+            // Process Mouse Drag Events
+            case EventType.MouseDrag:
+                ProcessMouseDragEvent(currentEvent);
+                break;
+            default:
+                break;
+        }
+    }
+    
+    /// <summary>
+    /// Process mouse down events
+    /// </summary>
+    /// <param name="currentEvent"></param>
+    private void ProcessMouseDownEvent(Event currentEvent)
+    {
+        // left click down
+        if (currentEvent.button == 0)
+        {
+            ProcessLeftClickDownEvent();
+        }
+        // right click down
+        else if (currentEvent.button == 1)
+        {
+            ProcessRightClickDownEvent(currentEvent);
+        }
+    }
+
+    /// <summary>
+    /// Process left click down event
+    /// </summary>
+    private void ProcessLeftClickDownEvent()
+    {
+        Selection.activeObject = this;
+
+        // Toggle node selection
+        if (isSelected == true)
+        {
+            isSelected = false;
+        }
+        else
+        {
+            isSelected = true;
+        }
+    }
+
+    /// <summary>
+    /// Process right click down
+    /// </summary>
+    /// <param name="currentEvent"></param>
+    private void ProcessRightClickDownEvent(Event currentEvent)
+    {
+        roomNodeGraph.SetNodeToDrawConnectionLineFrom(this, currentEvent.mousePosition);
+    }
+
+    /// <summary>
+    /// Process mouse up event
+    /// </summary>
+    /// <param name="currentEvent"></param>
+    private void ProcessMouseUpEvent(Event currentEvent)
+    {
+        // left click up
+        if (currentEvent.button == 0)
+        {
+            ProcessLeftClickUpEvent();
+        }
+    }
+
+    /// <summary>
+    /// Process left click up event
+    /// </summary>
+    private void ProcessLeftClickUpEvent()
+    {
+        if (isLeftClickDragging)
+        {
+            isLeftClickDragging = false;
+        }
+    }
+
+    /// <summary>
+    /// Process mouse drag event
+    /// </summary>
+    /// <param name="currentEvent"></param>
+    private void ProcessMouseDragEvent(Event currentEvent)
+    {
+        // process left click drag event
+        if (currentEvent.button == 0)
+        {
+            ProcessLeftMouseDragEvent(currentEvent);
+        }
+    }
+
+    /// <summary>
+    /// Process left mouse drag event
+    /// </summary>
+    /// <param name="currentEvent"></param>
+    private void ProcessLeftMouseDragEvent(Event currentEvent)
+    {
+        isLeftClickDragging = true;
+
+        DragNode(currentEvent.delta);
+        GUI.changed = true;
+    }
+
+
+    private void DragNode(Vector2 delta)
+    {
+        rect.position += delta;
+        EditorUtility.SetDirty(this);
+    }
+
+    /// <summary>
+    /// Add childID to the node (returns true if the node has been added, false otherwise)
+    /// </summary>
+    /// <param name="childID"></param>
+    /// <returns></returns>
+    public bool AddChildRoomNodeIDToRoomNode(string childID)
+    {
+        childRoomNodeIDList.Add(childID);
+        return true;
+    }
+
+    /// <summary>
+    /// Add parentID to the node (returns true if the node has been added, false otherwise)
+    /// </summary>
+    /// <param name="ParentID"></param>
+    /// <returns></returns>
+    public bool AddParentRoomNodeIDToRoomNode(string parentID)
+    {
+        parentRoomNodeIDList.Add(parentID);
+        return true;
     }
 
 #endif
