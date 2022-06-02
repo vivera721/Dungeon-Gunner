@@ -68,12 +68,36 @@ public class RoomNodeSO : ScriptableObject
 
             roomNodeType = roomNodeTypeList.list[selection];
 
-        }
-        if (EditorGUI.EndChangeCheck())
-        {
-            EditorUtility.SetDirty(this);
+            // if the room type selection has changed making child connections potentially invalid
+            // 링크 혹은 노드 제거시 남아있는 노드 묶음 중 유효하지 않은 방법으로 바뀔수 있는 노드 삭제
+            if (roomNodeTypeList.list[selected].isCorridor && !roomNodeTypeList.list[selection].isCorridor || !roomNodeTypeList.list[selected].isCorridor
+                 && roomNodeTypeList.list[selection].isCorridor || !roomNodeTypeList.list[selected].isBossRoom && roomNodeTypeList.list[selection].isBossRoom)
+            {
+                // if a room node type has been changed and it already has children then delete the parent child links since we need to revalidate 
+                if (childRoomNodeIDList.Count > 0)
+                {
+                    for (int i = childRoomNodeIDList.Count - 1; i >= 0; i--)
+                    {
+                        // Get child room node
+                        RoomNodeSO childRoomNode = roomNodeGraph.GetRoomNode(childRoomNodeIDList[i]);
+
+                        // If the child room node is not null
+                        if (childRoomNode != null)
+                        {
+                            // Remove childID from parent room node
+                            RemoveChildRoomNodeIDFromRoomNode(childRoomNode.id);
+
+                            // Remove parentID from child room node
+                            childRoomNode.RemoveParentRoomNodeIDFromRoomNode(id);
+                        }
+                    }
+                }
+            }
         }
 
+        if (EditorGUI.EndChangeCheck())
+            EditorUtility.SetDirty(this);
+        
         GUILayout.EndArea();
 
     }
@@ -325,6 +349,35 @@ public class RoomNodeSO : ScriptableObject
     {
         parentRoomNodeIDList.Add(parentID);
         return true;
+    }
+
+    /// <summary>
+    /// Remove childID from the node 자식 노드 삭제 
+    /// </summary>
+    public bool RemoveChildRoomNodeIDFromRoomNode(string childID)
+    {
+        // if the node contains the child ID then remove it
+        if (childRoomNodeIDList.Contains(childID))
+        {
+            childRoomNodeIDList.Remove(childID);
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Remove parentID from the node 부모 노드 삭제 
+    /// </summary>
+    public bool RemoveParentRoomNodeIDFromRoomNode(string parentID)
+    {
+        // if the node contains the parent ID then remove it
+        if (parentRoomNodeIDList.Contains(parentID))
+        {
+            parentRoomNodeIDList.Remove(parentID);
+            return true;
+        }
+
+        return false;
     }
 
 #endif
