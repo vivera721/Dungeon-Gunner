@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 776156336035837497}
   - component: {fileID: 8697308699446852924}
+  - component: {fileID: 1552470327754146301}
   m_Layer: 12
   m_Name: MediumRoom_MyRooms_1
   m_TagString: Untagged
@@ -60,6 +61,28 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 56, y: 47}
   m_EdgeRadius: 0
+--- !u!114 &1552470327754146301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 749636323743561756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8a85b52a6a7ffa41b69d13799b607b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  grid: {fileID: 0}
+  groundTilemap: {fileID: 0}
+  decoration1Tilemap: {fileID: 0}
+  decoration2Tilemap: {fileID: 0}
+  frontTilemap: {fileID: 0}
+  collisionTilemap: {fileID: 0}
+  minimapTilemap: {fileID: 0}
+  roomColliderBounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
 --- !u!1 &1226187930432961511
 GameObject:
   m_ObjectHideFlags: 0
