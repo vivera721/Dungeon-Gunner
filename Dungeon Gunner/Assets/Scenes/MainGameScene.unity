@@ -655,7 +655,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6ca35851fc4ecd04ea4128e2df29b5be, type: 2}
   - {fileID: 11400000, guid: 00d48dae997d11c469b8acc86cb648f2, type: 2}
   - {fileID: 11400000, guid: 91e6d933027ee7f4ebb5dbd4e677d2e4, type: 2}
-  currentDungeonLevelListIndex: 5
+  currentDungeonLevelListIndex: 0
   gameState: 0
 --- !u!4 &1303790332
 Transform:
@@ -766,6 +766,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2012445121}
   - component: {fileID: 2012445122}
+  - component: {fileID: 2012445123}
   m_Layer: 0
   m_Name: CinemachineTargetGroup
   m_TagString: Untagged
@@ -804,3 +805,15 @@ MonoBehaviour:
   m_RotationMode: 0
   m_UpdateMethod: 2
   m_Targets: []
+--- !u!114 &2012445123
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2012445120}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c4ea45c8d85f1c409c7d61af15d2ee9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
