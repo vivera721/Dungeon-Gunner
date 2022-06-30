@@ -119,6 +119,10 @@ public class GameManager : SingletoneMonobehaviour<GameManager>
             Debug.LogError("지정된 룸 및 노드 그래프에서 던전을 작성할 수 없습니다.");
         }
 
+        // Call static event that room has changed
+        // 게임 시작시 방 변경 이벤트 트리거 작동
+        StaticEventHandler.CallRoomChangedEvent(currentRoom);
+
         // set player roughly mid-room
         player.gameObject.transform.position = new Vector3((currentRoom.lowerBounds.x + currentRoom.upperBounds.x) / 2f,
                                                              (currentRoom.lowerBounds.y + currentRoom.upperBounds.y) / 2f, 0f);

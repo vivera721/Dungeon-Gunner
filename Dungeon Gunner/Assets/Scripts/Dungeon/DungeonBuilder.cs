@@ -12,6 +12,19 @@ public class DungeonBuilder : SingletoneMonobehaviour<DungeonBuilder>
     private RoomNodeTypeListSO roomNodeTypeList;
     private bool dungeonBuildSuccessful;
 
+
+    private void OnEnable()
+    {
+        // Set dimmed material to off
+        GameResources.Instance.dimmedMaterial.SetFloat("Alpha_Slider", 0f);
+    }
+
+    private void OnDisable()
+    {
+        // Set dimmed material to fully visible
+        GameResources.Instance.dimmedMaterial.SetFloat("Alpha_Slider", 1f);
+    }
+
     protected override void Awake()
     {
         base.Awake();
@@ -19,9 +32,9 @@ public class DungeonBuilder : SingletoneMonobehaviour<DungeonBuilder>
         // Load the room node type list
         LoadRoomNodeTypeList();
 
-        // Set dimmed material to fully visible
-        // 셰이더 그래프에서 사용했던 Alpha_Slider 값을 설정
-        GameResources.Instance.dimmedMaterial.SetFloat("Alpha_Slider", 1f);
+        //// Set dimmed material to fully visible
+        //// 셰이더 그래프에서 사용했던 Alpha_Slider 값을 설정
+        //GameResources.Instance.dimmedMaterial.SetFloat("Alpha_Slider", 1f);
 
     }
 
