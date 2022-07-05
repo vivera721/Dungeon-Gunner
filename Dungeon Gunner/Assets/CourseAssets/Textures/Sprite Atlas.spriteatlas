@@ -4055,7 +4055,6 @@ SpriteAtlas:
   - {fileID: 7454418708075110115, guid: 915e47dc64e318b40b0f6770cb75233b, type: 3}
   - {fileID: -826163751876066968, guid: 915e47dc64e318b40b0f6770cb75233b, type: 3}
   - {fileID: -2820348791848118664, guid: 915e47dc64e318b40b0f6770cb75233b, type: 3}
-  - {fileID: 21300000, guid: 83d5fedc88f16bf4485541bb9b38e6ae, type: 3}
   - {fileID: -8450271352702909443, guid: 7e0620ecc96ef624185e2e68c318383e, type: 3}
   - {fileID: 3414119368773319445, guid: 7e0620ecc96ef624185e2e68c318383e, type: 3}
   - {fileID: 1303592478981417521, guid: 7e0620ecc96ef624185e2e68c318383e, type: 3}
@@ -8950,7 +8949,6 @@ SpriteAtlas:
   - wall_old_blood06_2
   - wall_old_blood06_1
   - wall_old_blood06_0
-  - Shader Test Colours
   - pebble_brown4_3
   - pebble_brown4_2
   - pebble_brown4_1
