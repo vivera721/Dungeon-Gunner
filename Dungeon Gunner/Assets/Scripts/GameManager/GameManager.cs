@@ -88,11 +88,11 @@ public class GameManager : SingletoneMonobehaviour<GameManager>
     {
         HandleGameState();
 
-        // 테스트 용 - 나중에 삭제할 것
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            gameState = GameState.gameStarted;
-        }
+        //// 테스트 용 - 나중에 삭제할 것
+        //if (Input.GetKeyDown(KeyCode.P))
+        //{
+        //    gameState = GameState.gameStarted;
+        //}
 
     }
 

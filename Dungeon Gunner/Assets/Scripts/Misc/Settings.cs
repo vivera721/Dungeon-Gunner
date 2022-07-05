@@ -55,4 +55,15 @@ public static class Settings
     public const string playerWeapon = "playerWeapon";
     #endregion
 
+
+    #region FIRING CONTROL
+    // 타겟과의 거리가 useAimAngleDistance 보다 짧다면 Aim Angle 이 사용되고 - 플레이어에서 부터 계산됨
+    // 타겟과의 거리가 useAimAngleDistance 보다 멀다면 weapon aim angle 이 사용된다 - 무기 발사 위치에서 부터 계산됨
+    public const float useAimAngleDistance = 3.5f;
+    #endregion
+
+    #region UI PARAMETERS
+    public const float uiAmmoIconSpacing = 4f;
+    #endregion
+
 }

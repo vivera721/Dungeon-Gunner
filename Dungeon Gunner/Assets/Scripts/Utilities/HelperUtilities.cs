@@ -31,7 +31,7 @@ public static class HelperUtilities
 
     /// <summary>
     /// Get the angle in degrees from a direction vector.
-    /// 삼각법을 사용 - x 거리와, y거리 떨어져있을때 벡터는 vector(x,y) 이다
+    /// 삼각함수를 사용 - x 거리와, y거리 떨어져있을때 벡터는 vector(x,y) 이다
     /// x거리, y거리, 벡터를 삼각형으로 표현했을때 밑변과 대각(벡터)이 이루는 각을 angle 이라 할때
     /// tan(angle) = y/x
     /// angle = arc tan(y/x) (역탄젠트) 이다
@@ -44,6 +44,18 @@ public static class HelperUtilities
         float degrees = radians * Mathf.Rad2Deg;
 
         return degrees;
+    }
+
+    /// <summary>
+    /// Get the direction vector from an angle in degrees
+    /// 각도를 이용하여 방향벡터를 얻는 방법
+    /// 삼각함수에서 (단위 원 일때) 밑변은 코사인(각도) 이고 높이는 사인(각도) 이다 (단위 원 일때 인 이유 - 빗변의 길이는 필요치 않고 방향벡터만 필요하다)
+    /// (반지름이 1인 단위 원 일때 이니까 라디안 값으로 바꾼다)
+    /// </summary>
+    public static Vector3 GetDirectionVectorFromAngle(float angle)
+    {
+        Vector3 directionVector = new Vector3(Mathf.Cos(Mathf.Deg2Rad * angle), Mathf.Sin(Mathf.Deg2Rad * angle), 0f);
+        return directionVector;
     }
 
     /// <summary>
