@@ -60,6 +60,9 @@ public class Ammo : MonoBehaviour, IFireable
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        // Show ammo hit effect
+        AmmoHitEffect();
+
         DisableAmmo();
     }
 
@@ -178,6 +181,30 @@ public class Ammo : MonoBehaviour, IFireable
     private void DisableAmmo()
     {
         gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// Display the ammo hit effect
+    /// </summary>
+    private void AmmoHitEffect()
+    {
+        // Process if a hit effect has been specified
+        // 탄 충돌 이펙트와 탄 충돌 이펙트 프리팹이 둘다 있으면
+        if (ammoDetails.ammoHitEffect != null && ammoDetails.ammoHitEffect.ammoHitEffectPrefab != null)
+        {
+            // Get ammo hit effect gameobject from the pool (with particle system component)
+            // 오브젝트 풀에서 탄 충돌 게임오브젝트를 꺼낸다 (파티클 시스템과 같이)
+            AmmoHitEffect ammoHitEffect = (AmmoHitEffect)PoolManager.Instance.ReuseComponent
+                (ammoDetails.ammoHitEffect.ammoHitEffectPrefab, transform.position, Quaternion.identity);
+
+            // Set Hit Effect
+            // 탄 충돌 이펙트 설정
+            ammoHitEffect.SetHitEffect(ammoDetails.ammoHitEffect);
+
+            // Set gameobject active (the particle system is set to automatically disable the gameobject once finished)
+            ammoHitEffect.gameObject.SetActive(true);
+
+        }
     }
 
 

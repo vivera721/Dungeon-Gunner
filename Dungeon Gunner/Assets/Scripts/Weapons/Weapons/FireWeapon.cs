@@ -197,8 +197,37 @@ public class FireWeapon : MonoBehaviour
         // Call weapon fired event
         weaponFiredEvent.CallWeaponFiredEvent(activeWeapon.GetCurrentWeapon());
 
+        // Display weapon shoot effect
+        WeaponShootEffect(aimAngle);
+
         // Weapon fired sound effect
         WeaponSoundEffect();
+    }
+
+    /// <summary>
+    /// Display weapon shoot effect
+    /// </summary>
+    private void WeaponShootEffect(float aimAngle)
+    {
+        // Process if there is a shoot effect & prefab
+        // 발사 이펙트와 발사 이펙트 프리팹이 있다면
+        if (activeWeapon.GetCurrentWeapon().weaponDetails.weaponShootEffect != null && activeWeapon.GetCurrentWeapon().weaponDetails.weaponShootEffect.weaponShootEffectPrefab != null)
+        {
+            // Get weapon shoot effect gameobject from the pool with particle system component
+            // 오브젝트 풀에서 무기 발사 이펙트 게임오브젝트와 파티클 시스템 컴포넌트 얻음
+            WeaponShootEffect weaponShootEffect = (WeaponShootEffect)PoolManager.Instance.ReuseComponent
+                (activeWeapon.GetCurrentWeapon().weaponDetails.weaponShootEffect.weaponShootEffectPrefab, activeWeapon.GetShootEffectPosition(), Quaternion.identity);
+
+            // Set shoot effect
+            // 발사 이펙트 설정
+            weaponShootEffect.SetShootEffect(activeWeapon.GetCurrentWeapon().weaponDetails.weaponShootEffect, aimAngle);
+
+            // Set gameobject active (the particle system is set to automatically disable the gameobject once finished
+            // 이펙트 active 로 설정
+            weaponShootEffect.gameObject.SetActive(true);
+
+        }
+
     }
 
     /// <summary>
