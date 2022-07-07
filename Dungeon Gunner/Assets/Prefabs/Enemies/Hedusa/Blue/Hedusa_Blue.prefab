@@ -55,6 +55,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Hedusa_Blue
       objectReference: {fileID: 0}
+    - target: {fileID: 1655193852142958132, guid: 223fa54a701fbea4ab0277ed61d5c5ee, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 19b6ff9fbadc74e479b63068d33eb245, type: 2}
     - target: {fileID: 4579198232163675845, guid: 223fa54a701fbea4ab0277ed61d5c5ee, type: 3}
       propertyPath: m_Sprite
       value: 

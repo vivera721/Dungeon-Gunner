@@ -83,6 +83,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SkullFace_Green
       objectReference: {fileID: 0}
+    - target: {fileID: 1655193852142958132, guid: 223fa54a701fbea4ab0277ed61d5c5ee, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 2a6e05932cc7db243b3bb6296cff5612, type: 2}
     - target: {fileID: 4579198232163675845, guid: 223fa54a701fbea4ab0277ed61d5c5ee, type: 3}
       propertyPath: m_Sprite
       value: 
