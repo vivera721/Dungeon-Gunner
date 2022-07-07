@@ -147,9 +147,14 @@ public static class AStar
                     // 인접노드에 대해 새로운 gCost 를 계산
                     int newCostToNeighbor;
 
+                    // Get the movement penalty
+                    // Unwalkable paths have a value of 0. Default movement penalty is set in Settings and applies to other grid squares
+                    // 지나갈수 없는 경로는 0 값을 가지고 기본 이동 패널티는 Settings 에서 설정되며 다른 그리드 사각형에 적용된다
+                    int movementPenaltyForGridSpace = instantiatedRoom.aStarMovementPenalty[validNeighborNode.gridPosition.x, validNeighborNode.gridPosition.y];
+
                     // 현재 노드와 유효한 인접 노드 사이의 거리
                     // currentNode 는 인접노드를 평가하는 부모 노드
-                    newCostToNeighbor = currentNode.gCost + GetDistance(currentNode, validNeighborNode);
+                    newCostToNeighbor = currentNode.gCost + GetDistance(currentNode, validNeighborNode) + movementPenaltyForGridSpace;
 
                     bool isValidNeighborNodeInOpenList = openNodeList.Contains(validNeighborNode);
 
@@ -214,10 +219,13 @@ public static class AStar
         // Get neighbor node
         Node neighborNode = gridNodes.GetGridNode(neighborNodeXPosition, neighborNodeYPosition);
 
-        // if neighbor is in the closed list then skip
-        // 이웃노드가 닫힌 목록에 있다면 스킵
-        // 노드가 장애물인 경우 실제로 노드를 건너뛰는 알고리즘 부분
-        if (closedNodeHashSet.Contains(neighborNode))
+        // check for obstacle at that position
+        // 그 위치가 장애물인지 체크
+        int movementPenaltyForGridSpace = instantiatedRoom.aStarMovementPenalty[neighborNodeXPosition, neighborNodeYPosition];
+
+        // if neighbor is an obstacle or neighbor is in the closed list then skip
+        // 이웃이 장애물이거나 이웃이 닫힌 목록에 있다면 스킵
+        if (movementPenaltyForGridSpace == 0 || closedNodeHashSet.Contains(neighborNode))
         {
             return null;
         }
