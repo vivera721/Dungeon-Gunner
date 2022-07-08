@@ -28,6 +28,7 @@ public class GameManager : SingletoneMonobehaviour<GameManager>
     private Player player;
 
     [HideInInspector] public GameState gameState;
+    [HideInInspector] public GameState previousGameState;
 
     protected override void Awake()
     {
@@ -80,6 +81,8 @@ public class GameManager : SingletoneMonobehaviour<GameManager>
     // Start is called before the first frame update
     private void Start()
     {
+        previousGameState = GameState.gameStarted;
+
         gameState = GameState.gameStarted;
     }
 
@@ -175,6 +178,14 @@ public class GameManager : SingletoneMonobehaviour<GameManager>
     public Room GetCurrentRoom()
     {
         return currentRoom;
+    }
+
+    /// <summary>
+    /// Get the current dungeon level
+    /// </summary>
+    public DungeonLevelSO GetCurrentDungeonLevel()
+    {
+        return dungeonLevelList[currentDungeonLevelListIndex];
     }
 
 

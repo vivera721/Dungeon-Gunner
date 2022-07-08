@@ -1,0 +1,157 @@
+using System.Collections;
+using UnityEngine;
+
+[DisallowMultipleComponent]
+public class EnemySpawner : SingletoneMonobehaviour<EnemySpawner>
+{
+    private int enemiesToSpawn;
+    private int currentEnemyCount;
+    private int enemiesSpawnedSoFar;
+    private int enemyMaxConcurrentSpawnNumber;
+    private Room currentRoom;
+    private RoomEnemySpawnParameters roomEnemySpawnParameters;
+
+
+    private void OnEnable()
+    {
+        StaticEventHandler.OnRoomChanged += StaticEventHandler_OnRoomChanged;
+    }
+
+    private void OnDisable()
+    {
+        StaticEventHandler.OnRoomChanged -= StaticEventHandler_OnRoomChanged;
+    }
+
+    private void StaticEventHandler_OnRoomChanged(RoomChangedEventArgs roomChangedEventArgs)
+    {
+        enemiesSpawnedSoFar = 0;
+        currentEnemyCount = 0;
+
+        currentRoom = roomChangedEventArgs.room;
+
+        // if the room is a corridor or the entrance then return
+        // 현재 방이 복도이거나 입구 방 이라면 반환
+        if (currentRoom.roomNodeType.isCorridorEW || currentRoom.roomNodeType.isCorridorNS || currentRoom.roomNodeType.isEntrance)
+            return;
+
+        // if the room has already been defeated then return
+        // 방에 있는 적을 모두 제거했다면 반환
+        if (currentRoom.isClearedOfEnemies)
+            return;
+
+        // Get random number of eneimes to spawn
+        enemiesToSpawn = currentRoom.GetNumberOfEnemiesToSpawn(GameManager.Instance.GetCurrentDungeonLevel());
+
+        // Get room enemy spawn parameters
+        roomEnemySpawnParameters = currentRoom.GetRoomEnemySpawnParameters(GameManager.Instance.GetCurrentDungeonLevel());
+
+        // if no enemies to spawn return
+        // 더 이상 생성될 적이 없다면 반환
+        if (enemiesToSpawn == 0)
+        {
+            // Mark the room as cleared
+            currentRoom.isClearedOfEnemies = true;
+
+            return;
+        }
+
+        // Get concurrent number of enemies to spawn
+        enemyMaxConcurrentSpawnNumber = GetConcurrentEnemies();
+
+        // Lock doors
+        currentRoom.instantiatedRoom.LockDoors();
+
+        // Spawn Enemies
+        SpawnEnemies();
+
+    }
+
+    /// <summary>
+    /// Spawn the enemies
+    /// </summary>
+    private void SpawnEnemies()
+    {
+        // Set gamestate engaging enemies
+        if (GameManager.Instance.gameState == GameState.playingLevel)
+        {
+            GameManager.Instance.previousGameState = GameState.playingLevel;
+            GameManager.Instance.gameState = GameState.engagingEnemies;
+        }
+
+        StartCoroutine(SpawnEnemiesRoutine());
+    }
+
+    /// <summary>
+    /// Spawn the enemies coroutine
+    /// </summary>
+    private IEnumerator SpawnEnemiesRoutine()
+    {
+        Grid grid = currentRoom.instantiatedRoom.grid;
+
+        // Create an instance of the helper class used to select a random enemy
+        RandomSpawnableObject<EnemyDetailsSO> randomEnemyHelperClass = new RandomSpawnableObject<EnemyDetailsSO>(currentRoom.enemiesByLevelList);
+
+        // Check we have somewhere to spawn the enemies
+        if (currentRoom.spawnPositionArray.Length > 0)
+        {
+            // Loop through to create all the enemies
+            for (int i = 0; i < enemiesToSpawn; i++)
+            {
+                // wait until current enemy count is less than max concurrent enemies
+                while (currentEnemyCount >= enemyMaxConcurrentSpawnNumber)
+                {
+                    yield return null;
+                }
+
+                // 적이 생성될 랜덤 위치
+                Vector3Int cellPositon = (Vector3Int)currentRoom.spawnPositionArray[Random.Range(0, currentRoom.spawnPositionArray.Length)];
+
+                // Create Enemy - Get next enemy type to spawn
+                // 적 생성
+                CreateEnemy(randomEnemyHelperClass.GetItem(), grid.CellToWorld(cellPositon));
+
+                yield return new WaitForSeconds(GetEnemySpawnInterval());
+
+            }
+        }
+    }
+
+    /// <summary>
+    /// Get a random spawn interval between the minimum and maximum values
+    /// </summary>
+    private float GetEnemySpawnInterval()
+    {
+        return (Random.Range(roomEnemySpawnParameters.minSpawnInterval, roomEnemySpawnParameters.maxSpawnInterval));
+    }
+
+    /// <summary>
+    /// Get a random spawn concurrent enemies between the minimum and maximum values
+    /// </summary>
+    private int GetConcurrentEnemies()
+    {
+        return (Random.Range(roomEnemySpawnParameters.minConcurrentEnemies, roomEnemySpawnParameters.maxConcurrentEnemies));
+    }
+
+    /// <summary>
+    /// Create an enemy in the specified position
+    /// </summary>
+    private void CreateEnemy(EnemyDetailsSO enemyDetails, Vector3 position)
+    {
+        // keep track of the number of enemies spawned so far
+        enemiesSpawnedSoFar++;
+
+        // Add one to the current enemy count - this is reduced when an enemy is destroyed
+        currentEnemyCount++;
+
+        // Get current dungeon level
+        DungeonLevelSO dungeonLevel = GameManager.Instance.GetCurrentDungeonLevel();
+
+        // Instantiate enemy
+        GameObject enemy = Instantiate(enemyDetails.enemyPrefab, position, Quaternion.identity, transform);
+
+        // Initialise enemy
+        enemy.GetComponent<Enemy>().EnemyInitialization(enemyDetails, enemiesSpawnedSoFar, dungeonLevel);
+
+    }
+
+}
