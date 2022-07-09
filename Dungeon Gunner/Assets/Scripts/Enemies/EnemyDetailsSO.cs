@@ -50,6 +50,42 @@ public class EnemyDetailsSO : ScriptableObject
     #endregion
     public Color enemyMaterializeColor;
 
+    #region Header ENEMY WEAPON SETTINGS
+    [Space(10)]
+    [Header("ENEMY WEAPON SETTINGS")]
+    #endregion
+    #region Tooltip
+    [Tooltip("The weapon for the enemy - none if the enemy doesn't have a weapon")]
+    #endregion
+    public WeaponDetailsSO enemyWeapon;
+    #region Tooltip
+    [Tooltip("The minimum time delay interval in seconds between bursts of enemy shooting. This value should be greater than 0." +
+        " A random value will be selected between the minimum value and the maximum value")]
+    #endregion
+    public float firingIntervalMin = 0.1f;
+    #region Tooltip
+    [Tooltip("The maximum time delay interval in seconds between bursts of enemy shooting. This value should be greater than 0." +
+        " A random value will be selected between the minimum value and the maximum value")]
+    #endregion
+    public float firingIntervalMax = 1f;
+    #region Tooltip
+    [Tooltip("The minimum firing duration that the enmy shoots for during a firing bursts. This value should be greater than 0." +
+        " A random value will be selected between the minimum value and the maximum value")]
+    #endregion
+    public float firingDurationMin = 1f;
+    #region Tooltip
+    [Tooltip("The maximum firing duration that the enmy shoots for during a firing bursts. This value should be greater than 0." +
+        " A random value will be selected between the minimum value and the maximum value")]
+    #endregion
+    public float firingDurationMax = 2f;
+    // 적이 발사하기 전에 플레이어의 시야가 필요한 경우 이 옵션을 선택합니다.
+    // 시야를 선택하지 않으면 플레이어가 '사거리 내에' 있을 때마다 장애물과 상관없이 적에게 발포합니다.
+    #region Tooltip
+    [Tooltip("Select this if line of sight is required of the player before the enemy fires. " +
+        "If line of sight isn't selected the enemy will fire regardless of obstacles whenever the player is 'in range'")]
+    #endregion
+    public bool firingLineOfSightRequired;
+
 
 
     #region Validation
@@ -62,6 +98,8 @@ public class EnemyDetailsSO : ScriptableObject
         HelperUtilities.ValidateCheckNullValue(this, nameof(enemyStandardMaterial), enemyStandardMaterial);
         HelperUtilities.ValidateCheckPositiveValue(this, nameof(enemyMaterializeTime), enemyMaterializeTime, true);
         HelperUtilities.ValidateCheckNullValue(this, nameof(enemyMaterializeShader), enemyMaterializeShader);
+        HelperUtilities.ValidateCheckPositiveRange(this, nameof(firingIntervalMin), firingIntervalMin, nameof(firingIntervalMax), firingIntervalMax, false);
+        HelperUtilities.ValidateCheckPositiveRange(this, nameof(firingDurationMin), firingDurationMin, nameof(firingDurationMax), firingDurationMax, false);
     }
 #endif
     #endregion
