@@ -17,6 +17,7 @@ public class Ammo : MonoBehaviour, IFireable
     private float ammoChargeTimer;
     private bool isAmmoMaterialSet = false;
     private bool overrideAmmoMovement;
+    private bool isColliding = false;
 
 
     private void Awake()
@@ -60,10 +61,34 @@ public class Ammo : MonoBehaviour, IFireable
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        // If already colliding with something return
+        // 이미 다른것과 충돌했다면 다시 반환
+        if (isColliding) return;
+
+        // Deal Damage To Collision Object
+        // 충돌된 물체에게 데미지 줌
+        DealDamage(collision);
+
         // Show ammo hit effect
         AmmoHitEffect();
 
         DisableAmmo();
+    }
+
+    /// <summary>
+    /// 충돌된 물체에게 데미지 줌 -- ammoDetails에 있는 데미지 만큼
+    /// </summary>
+    private void DealDamage(Collider2D collision)
+    {
+        Health health = collision.GetComponent<Health>();
+
+        if (health != null)
+        {
+            // Set isColliding to prevent ammo dealing damage multiple times
+            isColliding = true;
+
+            health.TakeDamage(ammoDetails.ammoDamage);
+        }
     }
 
     /// <summary>
@@ -77,6 +102,9 @@ public class Ammo : MonoBehaviour, IFireable
         #region Ammo
         // 탄약 정보 멤버 변수 감지 - 탄약 세부 사항에서 과거와 동일하게 만듦
         this.ammoDetails = ammoDetails;
+
+        // initialise isColliding
+        isColliding = false;
 
         // Set fire direction - 발사 방향 설정
         SetFireDirection(ammoDetails, aimAngle, weaponAimAngle, weaponAimDirectionVector);
