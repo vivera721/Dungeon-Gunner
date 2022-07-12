@@ -91,6 +91,9 @@ public class PlayerControl : MonoBehaviour
         // 플레이어 무기 입력
         WeaponInput();
 
+        // Process player use item input
+        UseItemInput();
+
         // Player roll cooldown timer
         PlayerRollCooldownTimer();
 
@@ -376,6 +379,33 @@ public class PlayerControl : MonoBehaviour
         {
             // Call the reload weapon event
             player.reloadWeaponEvent.CallReloadWeaponEvent(player.activeWeapon.GetCurrentWeapon(), 0);
+        }
+
+    }
+
+    /// <summary>
+    /// Use the nearest item within 2 unity units from the player
+    /// </summary>
+    private void UseItemInput()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            float useItemRadius = 2f;
+
+            // get any useable item near the palyer
+            Collider2D[] collider2DArray = Physics2D.OverlapCircleAll(player.GetPlayerPosition(), useItemRadius);
+
+            foreach (Collider2D collider2D in collider2DArray)
+            {
+                IUseable iUseable = collider2D.GetComponent<IUseable>();
+
+                if (iUseable != null)
+                {
+                    iUseable.UseItem();
+                }
+
+            }
+
         }
 
     }

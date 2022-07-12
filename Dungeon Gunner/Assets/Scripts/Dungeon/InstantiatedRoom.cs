@@ -16,7 +16,10 @@ public class InstantiatedRoom : MonoBehaviour
     [HideInInspector] public Tilemap collisionTilemap;
     [HideInInspector] public Tilemap minimapTilemap;
     [HideInInspector] public int[,] aStarMovementPenalty; // use this 2d array to store movement penalties from the tilemaps to be used in AStar pathfinding
+    [HideInInspector] public int[,] aStarItemObstacles; // use to store position of moveable items that are obstacles
     [HideInInspector] public Bounds roomColliderBounds;
+    [HideInInspector] public List<MoveItem> moveableItemsList = new List<MoveItem>();
+
 
     #region Header OBJECT REFERENCES
     [Space(10)]
@@ -35,6 +38,12 @@ public class InstantiatedRoom : MonoBehaviour
 
         // Save room collider bounds
         roomColliderBounds = boxCollider2D.bounds;
+    }
+
+    private void Start()
+    {
+        // Update moveable item obstacles array
+        UpdateMoveableObestacles();
     }
 
     // Trigger room changed event when player enters a room
@@ -63,6 +72,8 @@ public class InstantiatedRoom : MonoBehaviour
         BlockOffUnusedDoorWays();
 
         AddObstaclesAndPreferredPaths();
+
+        CreateItemObstaclesArray();
 
         AddDoorsToRooms();
 
@@ -417,6 +428,70 @@ public class InstantiatedRoom : MonoBehaviour
         EnableRoomCollider();
 
     }
+
+    /// <summary>
+    /// Create Item Obstacles Array
+    /// </summary>
+    private void CreateItemObstaclesArray()
+    {
+        // this array will be populate during gameplay with any moveable obstacles
+        aStarItemObstacles = new int[room.templateUpperBounds.x - room.templateLowerBounds.x + 1, room.templateUpperBounds.y - room.templateLowerBounds.y + 1];
+    }
+
+    /// <summary>
+    /// Initialise item obstacles array with default aStar movement penalty values
+    /// </summary>
+    private void InitialiseItemObstaclesArray()
+    {
+        for (int x = 0; x < (room.templateUpperBounds.x - room.templateLowerBounds.x + 1); x++)
+        {
+            for (int y = 0; y < (room.templateUpperBounds.y - room.templateLowerBounds.y + 1); y++)
+            {
+                // Set default movement penalty for grid sqaures
+                aStarMovementPenalty[x, y] = Settings.defaultAStarMovementPenalty;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Update the array of moveable obstacles
+    /// </summary>
+    public void UpdateMoveableObestacles()
+    {
+        InitialiseItemObstaclesArray();
+
+        foreach (MoveItem moveItem in moveableItemsList)
+        {
+            Vector3Int colliderBoundsMin = grid.WorldToCell(moveItem.boxCollider2D.bounds.min);
+            Vector3Int colliderBoundsMax = grid.WorldToCell(moveItem.boxCollider2D.bounds.max);
+
+            for (int i = colliderBoundsMin.x; i < colliderBoundsMax.x; i++)
+            {
+                for (int j = colliderBoundsMin.y; j < colliderBoundsMax.y; j++)
+                {
+                    aStarItemObstacles[i - room.templateLowerBounds.x, j - room.templateLowerBounds.y] = 0;
+                }
+            }
+        }
+    }
+
+
+    //private void OnDrawGizmos()
+    //{
+    //    for (int i = 0; i < (room.templateUpperBounds.x - room.templateLowerBounds.x + 1); i++)
+    //    {
+    //        for (int j = 0; j < (room.templateUpperBounds.y - room.templateLowerBounds.y + 1); j++)
+    //        {
+    //            if (aStarItemObstacles[i, j] == 0)
+    //            {
+    //                Vector3 worldCellPos = grid.CellToWorld(new Vector3Int(i + room.templateLowerBounds.x, j + room.templateLowerBounds.y, 0));
+
+    //                Gizmos.DrawWireCube(new Vector3(worldCellPos.x + 0.5f, worldCellPos.y + 0.5f, 0), Vector3.one);
+    //            }
+    //        }
+    //    }
+    //}
+
 
     #region Validation
 #if UNITY_EDITOR

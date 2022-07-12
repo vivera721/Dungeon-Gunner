@@ -223,9 +223,13 @@ public static class AStar
         // 그 위치가 장애물인지 체크
         int movementPenaltyForGridSpace = instantiatedRoom.aStarMovementPenalty[neighborNodeXPosition, neighborNodeYPosition];
 
+        // check for moveable obstacle at that position
+        // 그 위치가 이동가능한 장애물인지 체크
+        int itemObstacleForGridSpace = instantiatedRoom.aStarItemObstacles[neighborNodeXPosition, neighborNodeYPosition];
+
         // if neighbor is an obstacle or neighbor is in the closed list then skip
         // 이웃이 장애물이거나 이웃이 닫힌 목록에 있다면 스킵
-        if (movementPenaltyForGridSpace == 0 || closedNodeHashSet.Contains(neighborNode))
+        if (movementPenaltyForGridSpace == 0 || itemObstacleForGridSpace ==0 ||closedNodeHashSet.Contains(neighborNode))
         {
             return null;
         }
