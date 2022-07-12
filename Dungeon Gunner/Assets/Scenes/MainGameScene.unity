@@ -1990,6 +1990,24 @@ MonoBehaviour:
   - poolSize: 200
     prefab: {fileID: 1094736990469235277, guid: 4b4259dd9ec2e994eae9dbe2652b9c14, type: 3}
     componentType: IFireable
+  - poolSize: 10
+    prefab: {fileID: 8696965214923977787, guid: a839644eae057a34e8dd40668e4d6d18, type: 3}
+    componentType: IFireable
+  - poolSize: 10
+    prefab: {fileID: 4655276663008834973, guid: aa4ce6b2a1e78db4684b4b547d8bcd10, type: 3}
+    componentType: IFireable
+  - poolSize: 10
+    prefab: {fileID: 4655276663008834973, guid: 441e07293824ee041904d1f19b26781a, type: 3}
+    componentType: IFireable
+  - poolSize: 10
+    prefab: {fileID: 4655276663008834973, guid: 3eb37322ed946704b9be075174b0390b, type: 3}
+    componentType: IFireable
+  - poolSize: 10
+    prefab: {fileID: 4655276663008834973, guid: 7bf067cb5db77a244b46debea9cf714d, type: 3}
+    componentType: IFireable
+  - poolSize: 10
+    prefab: {fileID: 4655276663008834973, guid: 0d295591be30c794b9a0e99f4d532a45, type: 3}
+    componentType: IFireable
 --- !u!4 &951609625
 Transform:
   m_ObjectHideFlags: 0
@@ -2372,7 +2390,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6ca35851fc4ecd04ea4128e2df29b5be, type: 2}
   - {fileID: 11400000, guid: 00d48dae997d11c469b8acc86cb648f2, type: 2}
   - {fileID: 11400000, guid: 91e6d933027ee7f4ebb5dbd4e677d2e4, type: 2}
-  currentDungeonLevelListIndex: 0
+  currentDungeonLevelListIndex: 5
   gameState: 0
   previousGameState: 0
 --- !u!4 &1303790332

@@ -40,28 +40,34 @@ public class Ammo : MonoBehaviour, IFireable
             isAmmoMaterialSet = true;
         }
 
-        // Calculate distance vector to move ammo
-        // 거리벡터 설정
-        Vector3 distanceVector = fireDirectionVector * ammoSpeed * Time.deltaTime;
-
-        // 탄의 위치에 거리벡터가 추가됨으로서 움직임
-        transform.position += distanceVector;
-
-        // 거리벡터의 크기만큼 탄의 범위를 줄임
-        // Disable after max range reached
-        ammoRange -= distanceVector.magnitude;
-
-        // 탄이 최대거리 이동후 비활성화 - 거리가 0보다 작은데 탄이 계속 남아있는 것 방지
-        if (ammoRange < 0f)
+        // Don't move ammo if movement has been overriden - e.g. this ammo is part of an ammo pattern
+        if (!overrideAmmoMovement)
         {
-            if (ammoDetails.isPlayerAmmo)
+            // Calculate distance vector to move ammo
+            // 거리벡터 설정
+            Vector3 distanceVector = fireDirectionVector * ammoSpeed * Time.deltaTime;
+
+            // 탄의 위치에 거리벡터가 추가됨으로서 움직임
+            transform.position += distanceVector;
+
+            // 거리벡터의 크기만큼 탄의 범위를 줄임
+            // Disable after max range reached
+            ammoRange -= distanceVector.magnitude;
+
+            // 탄이 최대거리 이동후 비활성화 - 거리가 0보다 작은데 탄이 계속 남아있는 것 방지
+            if (ammoRange < 0f)
             {
-                // no multiplier
-                StaticEventHandler.CallMultiplierEvent(false);
+                if (ammoDetails.isPlayerAmmo)
+                {
+                    // no multiplier
+                    StaticEventHandler.CallMultiplierEvent(false);
+                }
+
+                DisableAmmo();
             }
 
-            DisableAmmo();
         }
+
 
     }
 
