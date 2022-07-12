@@ -103,6 +103,11 @@ public class EnemyDetailsSO : ScriptableObject
     #endregion
     public float hitImmunityTime;
 
+    #region Tooltip
+    [Tooltip("Select to display a health bar for the enemy")]
+    #endregion
+    public bool isHealthBarDisplayed = false;
+
     #region Validation
 #if UNITY_EDITOR
     private void OnValidate()

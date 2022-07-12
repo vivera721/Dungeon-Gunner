@@ -54,6 +54,12 @@ public class Ammo : MonoBehaviour, IFireable
         // 탄이 최대거리 이동후 비활성화 - 거리가 0보다 작은데 탄이 계속 남아있는 것 방지
         if (ammoRange < 0f)
         {
+            if (ammoDetails.isPlayerAmmo)
+            {
+                // no multiplier
+                StaticEventHandler.CallMultiplierEvent(false);
+            }
+
             DisableAmmo();
         }
 
@@ -82,12 +88,36 @@ public class Ammo : MonoBehaviour, IFireable
     {
         Health health = collision.GetComponent<Health>();
 
+        bool enemyHit = false;
+
         if (health != null)
         {
             // Set isColliding to prevent ammo dealing damage multiple times
             isColliding = true;
 
             health.TakeDamage(ammoDetails.ammoDamage);
+
+            // Enemy hit
+            if (health.enemy != null)
+            {
+                enemyHit = true;
+            }
+        }
+
+        // If player ammo then update multiplier
+        if (ammoDetails.isPlayerAmmo)
+        {
+            if (enemyHit)
+            {
+                // multiplier
+                StaticEventHandler.CallMultiplierEvent(true);
+            }
+            else
+            {
+                // no multiplier
+                StaticEventHandler.CallMultiplierEvent(false);
+            }
+
         }
     }
 

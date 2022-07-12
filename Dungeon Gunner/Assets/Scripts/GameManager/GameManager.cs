@@ -1,10 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 [DisallowMultipleComponent]
 public class GameManager : SingletoneMonobehaviour<GameManager>
 {
+    #region Header GAMEOBJECTS REFERENCES
+    [Space(10)]
+    [Header("GAMEOBJECTS REFERENCES")]
+    #endregion Header GAMEOBJECTS REFERENCES
+
+    #region Tooltip
+    [Tooltip("Populate with the MessageText textmeshpro component in the FadeScreenUI")]
+    #endregion Tooltip
+    [SerializeField] private TextMeshProUGUI messageTextTMP;
+
+    #region Tooltip
+    [Tooltip("Populate with the FadeImage canvasGroup component in the FadeScreenUI")]
+    #endregion Tooltip
+    [SerializeField] private CanvasGroup canvasGroup;
+
     #region Header DUNGEON LEVELS
     [Space(10)]
     [Header("DUNGEON LEVELS")]
@@ -29,6 +47,9 @@ public class GameManager : SingletoneMonobehaviour<GameManager>
 
     [HideInInspector] public GameState gameState;
     [HideInInspector] public GameState previousGameState;
+    private long gameScore;
+    private int scoreMultiplier;
+    private InstantiatedRoom bossRoom;
 
     protected override void Awake()
     {
@@ -62,12 +83,28 @@ public class GameManager : SingletoneMonobehaviour<GameManager>
     {
         // subscribe to room changed event
         StaticEventHandler.OnRoomChanged += StaticEventHandler_OnRoomChanged;
+
+        StaticEventHandler.OnRoomEnemiesDefeated += StaticEventHandler_OnRoomEnemiesDefeated;
+
+        StaticEventHandler.OnPointsScored += StaticEventHandler_OnPointsScored;
+
+        StaticEventHandler.OnMultiplier += StaticEventHandler_OnMultiplier;
+
+        player.destroyedEvent.OnDestroyed += Player_OnDestroyed;
     }
 
     private void OnDisable()
     {
         // unsubscribe to room changed event
         StaticEventHandler.OnRoomChanged -= StaticEventHandler_OnRoomChanged;
+
+        StaticEventHandler.OnRoomEnemiesDefeated -= StaticEventHandler_OnRoomEnemiesDefeated;
+
+        StaticEventHandler.OnPointsScored -= StaticEventHandler_OnPointsScored;
+
+        StaticEventHandler.OnMultiplier -= StaticEventHandler_OnMultiplier;
+
+        player.destroyedEvent.OnDestroyed -= Player_OnDestroyed;
     }
 
     /// <summary>
@@ -78,12 +115,70 @@ public class GameManager : SingletoneMonobehaviour<GameManager>
         SetCurrentRoom(roomChangedEventArgs.room);
     }
 
+
+    private void StaticEventHandler_OnRoomEnemiesDefeated(RoomEnemiesDefeatedArgs roomEnemiesDefeatedArgs)
+    {
+        RoomEnemiesDefeated();
+    }
+
+    /// <summary>
+    /// Handle points scored event
+    /// </summary>
+    private void StaticEventHandler_OnPointsScored(PointsScoreArgs pointsScoredArgs)
+    {
+        // Increase score
+        gameScore += pointsScoredArgs.points * scoreMultiplier;
+
+        // Call score changed event
+        StaticEventHandler.CallScoreChangedEvent(gameScore, scoreMultiplier);
+    }
+
+    /// <summary>
+    /// Handle score multiplier event
+    /// </summary>
+    private void StaticEventHandler_OnMultiplier(MultiplierArgs multiplierArgs)
+    {
+        if (multiplierArgs.multiplier)
+        {
+            scoreMultiplier++;
+        }
+        else
+        {
+            scoreMultiplier--;
+        }
+
+        // clamp between 1 and 30 -- 최대값 30
+        scoreMultiplier = Mathf.Clamp(scoreMultiplier, 1, 30);
+
+        // Call score changed event
+        StaticEventHandler.CallScoreChangedEvent(gameScore, scoreMultiplier);
+
+    }
+
+    /// <summary>
+    /// Handle player destroyed event
+    /// </summary>
+    private void Player_OnDestroyed(DestroyedEvent destroyedEvent, DestroyedEventArgs destroyedEventArgs)
+    {
+        previousGameState = gameState;
+        gameState = GameState.gameLost;
+    }
+
     // Start is called before the first frame update
     private void Start()
     {
         previousGameState = GameState.gameStarted;
 
         gameState = GameState.gameStarted;
+
+        // Set score to 0
+        gameScore = 0;
+
+        // Set multiplier to 1;
+        scoreMultiplier = 1;
+
+        // Set screen to black
+        StartCoroutine(Fade(0f, 1f, 0f, Color.black));
     }
 
     // Update is called once per frame
@@ -114,6 +209,45 @@ public class GameManager : SingletoneMonobehaviour<GameManager>
 
                 gameState = GameState.playingLevel;
 
+                // Trigger room enemies defeated since we start in the entrance where there are no enemies
+                // (just in case you have a level with just a boss room!)
+                RoomEnemiesDefeated();
+
+                break;
+
+
+            // Handle the level being completed
+            case GameState.levelCompleted:
+
+                // Display level completed text
+                StartCoroutine(LevelCompleted());
+
+                break;
+
+            // Handle the game being won -- 한번만 실행
+            case GameState.gameWon:
+
+                if (previousGameState != GameState.gameWon)
+                    StartCoroutine(GameWon());
+
+                break;
+
+            // Handle the game being lost -- 한번만 실행
+            case GameState.gameLost:
+
+                if (previousGameState != GameState.gameLost)
+                {
+                    StopAllCoroutines(); // Prevent messages if you clear the level just as you get killed
+                    StartCoroutine(GameLost());
+                }
+
+                break;
+
+            // Restart game
+            case GameState.restartGame:
+
+                RestartGame();
+
                 break;
 
         }
@@ -131,7 +265,59 @@ public class GameManager : SingletoneMonobehaviour<GameManager>
         // Debug.Log(room.prefab.name.ToString());
     }
 
-    
+    /// <summary>
+    /// Room enemies defeated - test if all dungeon rooms have been cleared of enemies - if so load next dungeon game level
+    /// </summary>
+    private void RoomEnemiesDefeated()
+    {
+        // Initialise dungeon as being cleared - but then test each room
+        bool isDungeonClearOfRegularEnemies = true;
+        bossRoom = null;
+
+        // Loop through all dungeon rooms to see if cleared of enemies
+        foreach (KeyValuePair<string, Room> keyValuePair in DungeonBuilder.Instance.dungeonBuilderRoomDictionary)
+        {
+            // skip boss room for time being
+            if (keyValuePair.Value.roomNodeType.isBossRoom)
+            {
+                bossRoom = keyValuePair.Value.instantiatedRoom;
+                continue;
+            }
+
+            // check if other rooms have been cleared of enemies
+            if (!keyValuePair.Value.isClearedOfEnemies)
+            {
+                isDungeonClearOfRegularEnemies = false;
+                break;
+            }
+
+        }
+
+        // Set game state
+        // if dungeon level completly cleared (i.e. dungeon cleared apart from boss and there is no boss room OR dungeon cleared apart from boss and boss room is also cleared)
+        if ((isDungeonClearOfRegularEnemies && bossRoom == null) || (isDungeonClearOfRegularEnemies && bossRoom.room.isClearedOfEnemies))
+        {
+            // Are there more dungeon levels then
+            if (currentDungeonLevelListIndex < dungeonLevelList.Count -1)
+            {
+                gameState = GameState.levelCompleted;
+            }
+            else
+            {
+                gameState = GameState.gameWon;
+            }
+        }
+        // Else if dungeon level cleared apart from boss room
+        else if (isDungeonClearOfRegularEnemies)
+        {
+            gameState = GameState.bossStage;
+
+            StartCoroutine(BossStage());
+        }
+
+    }
+
+
     private void PlayDungeonLevel(int DungeonLevelListIndex)
     {
         // 게임 시작시 던전을 레벨에 맞게 빌드
@@ -154,6 +340,216 @@ public class GameManager : SingletoneMonobehaviour<GameManager>
         // get nearest spawn point in room nearest to player
         player.gameObject.transform.position = HelperUtilities.GetSpawnPositionNearestToPlayer(player.gameObject.transform.position);
 
+        // Display dungeon level text
+        StartCoroutine(DisplayDungeonLevelText());
+
+        //// Demo Code
+        //RoomEnemiesDefeated();
+    }
+
+    /// <summary>
+    /// Display dungeon level text
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator DisplayDungeonLevelText()
+    {
+        // Set screen to black
+        StartCoroutine(Fade(0f, 1f, 0f, Color.black));
+
+        // 플레이어 못움직이게 만듦
+        GetPlayer().playerControl.DisablePlayer();
+
+        // 레벨 들어갈때 던전 레벨이 몇레벨인지 + 던전의 이름을 출력 -- ToUpper = 대문자로 출력
+        string messageText = "LEVEL " + (currentDungeonLevelListIndex + 1).ToString() + "\n\n" + dungeonLevelList[currentDungeonLevelListIndex].levelName.ToUpper();
+
+        yield return StartCoroutine(DisplayMessageRoutine(messageText, Color.white, 2f));
+
+        // 플레이어 움직이게 만듦
+        GetPlayer().playerControl.EnablePlayer();
+
+        // Fade in
+        yield return StartCoroutine(Fade(1f, 0f, 2f, Color.black));
+    }
+
+    /// <summary>
+    /// Display the message text for displaySeconds
+    /// 텍스트를 displaySeconds 만큼 화면에 출력
+    /// </summary>
+    private IEnumerator DisplayMessageRoutine(string text, Color textColor, float displaySeconds)
+    {
+        messageTextTMP.SetText(text);
+        messageTextTMP.color = textColor;
+
+        // Display the message for the given time
+        if (displaySeconds > 0f)
+        {
+            float timer = displaySeconds;
+
+            while (timer > 0f && !Input.GetKeyDown(KeyCode.Return))
+            {
+                timer -= Time.deltaTime;
+                yield return null;
+            }
+        }
+        // else display the message until the return button is pressed
+        else
+        {
+            while (!Input.GetKeyDown(KeyCode.Return))
+            {
+                yield return null;
+            }
+        }
+
+        yield return null;
+
+        // Clear text
+        messageTextTMP.SetText("");
+    }
+
+    /// <summary>
+    /// Enter boss stage
+    /// </summary>
+    private IEnumerator BossStage()
+    {
+        // Activate boss room
+        bossRoom.gameObject.SetActive(true);
+
+        // Unlock boss room
+        bossRoom.UnlockDoors(0f);
+
+        // Wait 2 sec
+        yield return new WaitForSeconds(2f);
+
+        // Fade in canvas to display text message
+        yield return StartCoroutine(Fade(0f, 1f, 2f, new Color(0f, 0f, 0f, 0.4f)));
+
+        // Display boss message
+        yield return StartCoroutine(DisplayMessageRoutine("WELL DONE " + GameResources.Instance.currentPlayer.playerName + "! YOU'VE SURVIVED ... SO FAR\n..\n" +
+            "NOW FIND AND DEFEAT THE BOSS.... GOOD LUCK!", Color.white, 5f));
+
+        // Fade out canvas
+        yield return StartCoroutine(Fade(1f, 0f, 2f, new Color(0f, 0f, 0f, 0.4f)));
+
+    }
+
+    /// <summary>
+    /// Show level as being completed - load next level
+    /// </summary>
+    private IEnumerator LevelCompleted()
+    {
+        // Play next level
+        gameState = GameState.playingLevel;
+
+        yield return new WaitForSeconds(2f);
+
+        // Fade in canvas to display text message
+        yield return StartCoroutine(Fade(0f, 1f, 2f, new Color(0f, 0f, 0f, 0.4f)));
+
+        // Display level completed
+        yield return StartCoroutine(DisplayMessageRoutine("WELL DONE " + GameResources.Instance.currentPlayer.playerName + "! YOU'VE SURVIVED THIS DUNGEON LEVEL" ,Color.white, 5f));
+
+        yield return StartCoroutine(DisplayMessageRoutine("COLLECT ANY LOOT... THEN PRESS RETURN\n\nTO DESCEND FURTHER INTO THE DUNGEON" ,Color.white, 5f));
+
+        // Fade out canvas
+        yield return StartCoroutine(Fade(1f, 0f, 2f, new Color(0f, 0f, 0f, 0.4f)));
+
+        while (!Input.GetKeyDown(KeyCode.Return))
+        {
+            yield return null;
+        }
+
+        // avoid enter being detexted twice
+        yield return null;
+
+        // Increase index to next level
+        currentDungeonLevelListIndex++;
+
+        PlayDungeonLevel(currentDungeonLevelListIndex);
+    }
+
+    /// <summary>
+    /// Fade canvas group
+    /// </summary>
+    public IEnumerator Fade(float startFadeAlpha, float targetFadeAlpha, float fadeSeconds, Color backgroundColor)
+    {
+        Image image = canvasGroup.GetComponent<Image>();
+        image.color = backgroundColor;
+
+        float time = 0;
+
+        while (time <= fadeSeconds)
+        {
+            time += Time.deltaTime;
+            canvasGroup.alpha = Mathf.Lerp(startFadeAlpha, targetFadeAlpha, time / fadeSeconds);
+            yield return null;
+        }
+
+    }
+
+    /// <summary>
+    /// Game won
+    /// </summary>
+    private IEnumerator GameWon()
+    {
+        previousGameState = GameState.gameWon;
+
+        // Disable player
+        GetPlayer().playerControl.DisablePlayer();
+
+        // Fade in canvas to display text message
+        yield return StartCoroutine(Fade(0f, 1f, 2f, Color.black));
+
+        // Display game won
+        yield return StartCoroutine(DisplayMessageRoutine("WELL DONE " + GameResources.Instance.currentPlayer.playerName + "! YOU'VE DEFEATED THE DUNGEON", Color.white, 3f));
+
+        yield return StartCoroutine(DisplayMessageRoutine("YOU SCORED " + gameScore.ToString("###,###0"), Color.white, 4f));
+
+        yield return StartCoroutine(DisplayMessageRoutine("PRESS RETURN TO RESTART THE GAME", Color.white, 0f));
+
+        // Set game state to restart game
+        gameState = GameState.restartGame;
+    }
+
+    /// <summary>
+    /// Game won
+    /// </summary>
+    private IEnumerator GameLost()
+    {
+        previousGameState = GameState.gameLost;
+
+        // Disalbe player
+        GetPlayer().playerControl.DisablePlayer();
+
+        yield return new WaitForSeconds(1f);
+        // Fade out canvas
+        yield return StartCoroutine(Fade(0f, 1f, 2f, Color.black));
+
+        // Disable enemies (FindObjectsOfType is resource hungry - but ok to use in this end of game situation)
+        // 적 비활성화 ( FindObjectsOfType 은 리소스를 많이 소모하지만 이게 실행되는 부분은 게임이 끝날때이기때문에 괜찮다)
+        Enemy[] enemyArray = GameObject.FindObjectsOfType<Enemy>();
+        foreach (Enemy enemy in enemyArray)
+        {
+            enemy.gameObject.SetActive(false);
+        }
+
+        // Display game lost
+        yield return StartCoroutine(DisplayMessageRoutine("BAD LUCK " + GameResources.Instance.currentPlayer.playerName + "! YOU'VE SUCCUMBED TO THE DUNGEON", Color.white, 2f));
+
+        yield return StartCoroutine(DisplayMessageRoutine("YOU SCORED " + gameScore.ToString("###,###0"), Color.white, 4f));
+
+        yield return StartCoroutine(DisplayMessageRoutine("PRESS RETURN TO RESTART THE GAME", Color.white, 0f));
+
+
+        // Set game state to restart game
+        gameState = GameState.restartGame;
+    }
+
+    /// <summary>
+    /// Restart the game
+    /// </summary>
+    private void RestartGame()
+    {
+        SceneManager.LoadScene("MainGameScene");
     }
 
     /// <summary>
@@ -195,6 +591,9 @@ public class GameManager : SingletoneMonobehaviour<GameManager>
 
     private void OnValidate()
     {
+        HelperUtilities.ValidateCheckNullValue(this, nameof(messageTextTMP), messageTextTMP);
+        HelperUtilities.ValidateCheckNullValue(this, nameof(canvasGroup), canvasGroup);
+
         HelperUtilities.ValidateCheckEnumerableValues(this, nameof(dungeonLevelList), dungeonLevelList);
     }
 

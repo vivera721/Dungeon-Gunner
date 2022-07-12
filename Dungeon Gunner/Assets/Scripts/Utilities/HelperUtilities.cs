@@ -30,6 +30,18 @@ public static class HelperUtilities
     }
 
     /// <summary>
+    /// Get the Camera viewport lower and upper bounds
+    /// </summary>
+    public static void CameraWorldPositionBounds(out Vector2Int cameraWorldPositionLowerBounds, out Vector2Int cameraWorldPositionUpperBounds, Camera camera)
+    {
+        Vector3 worldPositionViewportBottonLeft = camera.ViewportToWorldPoint(new Vector3(0f, 0f, 0f));
+        Vector3 worldPositionViewportTopRight = camera.ViewportToWorldPoint(new Vector3(1f, 1f, 0f));
+
+        cameraWorldPositionLowerBounds = new Vector2Int((int)worldPositionViewportBottonLeft.x, (int)worldPositionViewportBottonLeft.y);
+        cameraWorldPositionUpperBounds = new Vector2Int((int)worldPositionViewportTopRight.x, (int)worldPositionViewportTopRight.y);
+    }
+
+    /// <summary>
     /// Get the angle in degrees from a direction vector.
     /// 삼각함수를 사용 - x 거리와, y거리 떨어져있을때 벡터는 vector(x,y) 이다
     /// x거리, y거리, 벡터를 삼각형으로 표현했을때 밑변과 대각(벡터)이 이루는 각을 angle 이라 할때
