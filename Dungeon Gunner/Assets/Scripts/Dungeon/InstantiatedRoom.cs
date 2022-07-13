@@ -299,6 +299,11 @@ public class InstantiatedRoom : MonoBehaviour
                     // lock the door to prevent access to the room
                     doorComponent.LockDoor();
 
+                    // Instantiate skull icon for minimap by door
+                    // skull 아이콘을 문이 있는 위치에 미니맵 상에서 생성
+                    GameObject skullIcon = Instantiate(GameResources.Instance.minimapSkullPrefab, gameObject.transform);
+                    skullIcon.transform.localPosition = door.transform.localPosition;
+
                 }
 
             }

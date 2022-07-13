@@ -159,7 +159,6 @@ public class Chest : MonoBehaviour, IUseable
         else
         {
             chestState = ChestState.empty;
-            InstantiateHealthItem();
         }
     }
 

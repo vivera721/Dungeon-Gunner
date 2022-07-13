@@ -50,6 +50,7 @@ public class GameManager : SingletoneMonobehaviour<GameManager>
     private long gameScore;
     private int scoreMultiplier;
     private InstantiatedRoom bossRoom;
+    private bool isFading = false;
 
     protected override void Awake()
     {
@@ -215,6 +216,40 @@ public class GameManager : SingletoneMonobehaviour<GameManager>
 
                 break;
 
+            // While playing the level handle the tab key for the dungeon overview map
+            // 탭 키를 눌러서 던전 overview 맵을 볼수 있게 한다 
+            case GameState.playingLevel:
+
+                if (Input.GetKeyDown(KeyCode.Tab))
+                {
+                    DisplayDungeonOverviewMap();
+                }
+
+                break;
+
+            // If in the dungeon overview map handle the release of the tab key to clear the map
+            // 탭 키를 땔때 던전 overview 맵에서 빠져나온다 
+            case GameState.dungeonOverviewMap:
+
+                // 탭키를 땔때
+                if (Input.GetKeyUp(KeyCode.Tab))
+                {
+                    // overview map 에서 빠져나온다
+                    DungeonMap.Instance.ClearDungeonOverViewMap();
+                }
+
+                break;
+
+            // While playing the level and before the boss is engaged, handle the tab key for the dungeon overview map
+            // 레벨 플레이중이고 보스와 만나기 전이라면 탭 키를 눌러서 던전 overview 맵을 볼수 있게 한다 
+            case GameState.bossStage:
+
+                if (Input.GetKeyDown(KeyCode.Tab))
+                {
+                    DisplayDungeonOverviewMap();
+                }
+
+                break;
 
             // Handle the level being completed
             case GameState.levelCompleted:
@@ -317,6 +352,18 @@ public class GameManager : SingletoneMonobehaviour<GameManager>
 
     }
 
+    /// <summary>
+    /// Dungeon Map Screen Display
+    /// </summary>
+    private void DisplayDungeonOverviewMap()
+    {
+        // return if fading
+        if (isFading)
+            return;
+
+        // Display dungeonOverviewMap
+        DungeonMap.Instance.DisplayDungeonOverViewMap();
+    }
 
     private void PlayDungeonLevel(int DungeonLevelListIndex)
     {
@@ -472,6 +519,8 @@ public class GameManager : SingletoneMonobehaviour<GameManager>
     /// </summary>
     public IEnumerator Fade(float startFadeAlpha, float targetFadeAlpha, float fadeSeconds, Color backgroundColor)
     {
+        isFading = true;
+
         Image image = canvasGroup.GetComponent<Image>();
         image.color = backgroundColor;
 
@@ -484,6 +533,7 @@ public class GameManager : SingletoneMonobehaviour<GameManager>
             yield return null;
         }
 
+        isFading = false;
     }
 
     /// <summary>
