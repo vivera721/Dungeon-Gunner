@@ -15,13 +15,11 @@ MonoBehaviour:
   guid: a7672e04f1594d04c9ed2053fb2db9c3
   prefab: {fileID: 4327421925113694216, guid: f5e49864b76c0e345806bd5f59b67a27, type: 3}
   previousPrefab: {fileID: 4327421925113694216, guid: f5e49864b76c0e345806bd5f59b67a27, type: 3}
+  battleMusic: {fileID: 11400000, guid: 1f5584faa79b5ce46b847dd88a4d993c, type: 2}
+  ambientMusic: {fileID: 11400000, guid: bea2bf201a6323c44a5447bd408a6fd8, type: 2}
   roomNodeType: {fileID: 11400000, guid: 9468f9ef576896447aee38ff19de0c7a, type: 2}
   lowerBounds: {x: -5, y: 6}
   upperBounds: {x: 30, y: 19}
-  spawnPositionArray:
-  - {x: -1, y: 8}
-  - {x: 14, y: 14}
-  - {x: 25, y: 8}
   doorwayList:
   - position: {x: 30, y: 8}
     orientation: 1
@@ -39,3 +37,9 @@ MonoBehaviour:
     doorwayCopyTileHeight: 0
     isConnected: 0
     isUnavailable: 0
+  spawnPositionArray:
+  - {x: -1, y: 8}
+  - {x: 14, y: 14}
+  - {x: 25, y: 8}
+  enemiesByLevelList: []
+  roomEnemySpawnParametersList: []

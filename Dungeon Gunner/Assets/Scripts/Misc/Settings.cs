@@ -70,6 +70,11 @@ public static class Settings
     public const string playerWeapon = "playerWeapon";
     #endregion
 
+    #region AUDIO
+    public const float musicFadeOutTime = 0.5f; // Default music fade out transition
+    public const float musicFadeInTime = 0.5f; // Default music fade in transition
+    #endregion
+
 
     #region FIRING CONTROL
     // 타겟과의 거리가 useAimAngleDistance 보다 짧다면 Aim Angle 이 사용되고 - 플레이어에서 부터 계산됨
