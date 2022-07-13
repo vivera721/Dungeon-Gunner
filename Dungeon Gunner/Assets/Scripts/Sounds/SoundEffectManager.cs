@@ -8,8 +8,21 @@ public class SoundEffectManager : SingletoneMonobehaviour<SoundEffectManager>
 
     private void Start()
     {
+        // Check if volume levels have been saved in playerprefs - if so retrieve and set them
+        if (PlayerPrefs.HasKey("soundsVolume"))
+        {
+            soundsVolume = PlayerPrefs.GetInt("soundsVolume");
+        }
+
         SetSoundsVolume(soundsVolume);
     }
+
+    private void OnDisable()
+    {
+        // Save volume setting in playerprefs
+        PlayerPrefs.SetInt("soundsVolume", soundsVolume);
+    }
+
 
     /// <summary>
     /// Play the sound effect
@@ -32,6 +45,32 @@ public class SoundEffectManager : SingletoneMonobehaviour<SoundEffectManager>
     {
         yield return new WaitForSeconds(soundDuration);
         sound.gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// Increase sounds volume
+    /// </summary>
+    public void IncreaseSoundsVolume()
+    {
+        int maxMusicVolume = 20;
+
+        if (soundsVolume >= maxMusicVolume) return;
+
+        soundsVolume += 1;
+
+        SetSoundsVolume(soundsVolume);
+    }
+
+    /// <summary>
+    /// Decrease sounds volume
+    /// </summary>
+    public void DecreaseSoundsVolume()
+    {
+        if (soundsVolume == 0) return;
+
+        soundsVolume -= 1;
+
+        SetSoundsVolume(soundsVolume);
     }
 
     /// <summary>

@@ -14,6 +14,11 @@ public class GameManager : SingletoneMonobehaviour<GameManager>
     #endregion Header GAMEOBJECTS REFERENCES
 
     #region Tooltip
+    [Tooltip("Populate with pause menu gameobject in hierarchy")]
+    #endregion Tooltip
+    [SerializeField] private GameObject pauseMenu;
+
+    #region Tooltip
     [Tooltip("Populate with the MessageText textmeshpro component in the FadeScreenUI")]
     #endregion Tooltip
     [SerializeField] private TextMeshProUGUI messageTextTMP;
@@ -216,13 +221,29 @@ public class GameManager : SingletoneMonobehaviour<GameManager>
 
                 break;
 
-            // While playing the level handle the tab key for the dungeon overview map
-            // 탭 키를 눌러서 던전 overview 맵을 볼수 있게 한다 
+            // While playing the level handle the tab key for the dungeon overview map, escape key for the pause menu
+            // 플레이중에 ESC 키를 눌러서 Pause 메뉴를 열 수 있다 ,탭 키를 눌러서 던전 overview 맵을 볼수 있게 한다 
             case GameState.playingLevel:
+
+                if (Input.GetKeyDown(KeyCode.Escape))
+                {
+                    PauseGameMenu();
+                }
 
                 if (Input.GetKeyDown(KeyCode.Tab))
                 {
                     DisplayDungeonOverviewMap();
+                }
+
+                break;
+
+            // While engaging enemies handle the escape key for the pause menu
+            // 적과 싸우는 도중이라도 ESC 키를 눌러서 Pause 메뉴를 열 수 있다
+            case GameState.engagingEnemies:
+
+                if (Input.GetKeyDown(KeyCode.Escape))
+                {
+                    PauseGameMenu();
                 }
 
                 break;
@@ -240,13 +261,29 @@ public class GameManager : SingletoneMonobehaviour<GameManager>
 
                 break;
 
-            // While playing the level and before the boss is engaged, handle the tab key for the dungeon overview map
-            // 레벨 플레이중이고 보스와 만나기 전이라면 탭 키를 눌러서 던전 overview 맵을 볼수 있게 한다 
+            // While playing the level and before the boss is engaged, handle the tab key for the dungeon overview map, escape key for the pause menu
+            // 레벨 플레이중이고 보스와 만나기 전이라면 탭 키를 눌러서 던전 overview 맵을 볼수 있게 한다, 보스 스테이지여도 ESC 키를 눌러서 Pause 메뉴를 열 수 있다
             case GameState.bossStage:
+
+                if (Input.GetKeyDown(KeyCode.Escape))
+                {
+                    PauseGameMenu();
+                }
 
                 if (Input.GetKeyDown(KeyCode.Tab))
                 {
                     DisplayDungeonOverviewMap();
+                }
+
+                break;
+
+            // While engaging the boss handle the escape key for the pause menu
+            // 보스전 중이어도 ESC 키를 눌러서 Pause 메뉴를 열 수 있다
+            case GameState.engagingBoss:
+
+                if (Input.GetKeyDown(KeyCode.Escape))
+                {
+                    PauseGameMenu();
                 }
 
                 break;
@@ -285,7 +322,45 @@ public class GameManager : SingletoneMonobehaviour<GameManager>
 
                 break;
 
+            // if the game is paused and the pause menu showing, then pressing escape again will clear the pause menu
+            // pause 메뉴일때 ESC 키를 눌러서 나올수 있다
+            case GameState.gamePaused:
+
+                if (Input.GetKeyDown(KeyCode.Escape))
+                {
+                    PauseGameMenu();
+                }
+
+                break;
+
         }
+    }
+
+    /// <summary>
+    /// Pause game menu - also called from resume game button on pause menu
+    /// 일시정지 메뉴 - resume 버튼을 눌러서 이 함수를 다시 호출할수있다 --> resume 버튼을 눌러서 일시정지 메뉴를 나갈 수 있다
+    /// </summary>
+    public void PauseGameMenu()
+    {
+        if (gameState != GameState.gamePaused)
+        {
+            pauseMenu.SetActive(true);
+            GetPlayer().playerControl.DisablePlayer();
+
+            // Set game state
+            previousGameState = gameState;
+            gameState = GameState.gamePaused;
+        }
+        else if (gameState == GameState.gamePaused)
+        {
+            pauseMenu.SetActive(false);
+            GetPlayer().playerControl.EnablePlayer();
+
+            // Set game state
+            gameState = previousGameState;
+            previousGameState = GameState.gamePaused;
+        }
+
     }
 
     /// <summary>
@@ -641,6 +716,7 @@ public class GameManager : SingletoneMonobehaviour<GameManager>
 
     private void OnValidate()
     {
+        HelperUtilities.ValidateCheckNullValue(this, nameof(pauseMenu), pauseMenu);
         HelperUtilities.ValidateCheckNullValue(this, nameof(messageTextTMP), messageTextTMP);
         HelperUtilities.ValidateCheckNullValue(this, nameof(canvasGroup), canvasGroup);
 
