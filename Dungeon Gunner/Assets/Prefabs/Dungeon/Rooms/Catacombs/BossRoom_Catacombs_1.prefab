@@ -32944,6 +32944,7 @@ Transform:
   m_Children:
   - {fileID: 4603254633577131567}
   - {fileID: 4641884735082720320}
+  - {fileID: 144962211984505786}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -32995,6 +32996,7 @@ MonoBehaviour:
   roomColliderBounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
+  moveableItemsList: []
   environmentGameObject: {fileID: 2317068385254769796}
 --- !u!114 &-7425107171198366083
 MonoBehaviour:
@@ -104817,6 +104819,68 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 8736032075940590990, guid: 5ffb430bd3e67a64186cee8b197ee4fc, type: 3}
   m_PrefabInstance: {fileID: 7328679262128278490}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &7862672189207127190
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 8227588318318580144}
+    m_Modifications:
+    - target: {fileID: 2757300969211037588, guid: 86ec63542882eb74fb3f8415b5833f31, type: 3}
+      propertyPath: m_Name
+      value: ChestSpawner_EnemiesDefeated_BossRoom
+      objectReference: {fileID: 0}
+    - target: {fileID: 8007066915517783852, guid: 86ec63542882eb74fb3f8415b5833f31, type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8007066915517783852, guid: 86ec63542882eb74fb3f8415b5833f31, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -6.5747223
+      objectReference: {fileID: 0}
+    - target: {fileID: 8007066915517783852, guid: 86ec63542882eb74fb3f8415b5833f31, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 43.357372
+      objectReference: {fileID: 0}
+    - target: {fileID: 8007066915517783852, guid: 86ec63542882eb74fb3f8415b5833f31, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8007066915517783852, guid: 86ec63542882eb74fb3f8415b5833f31, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8007066915517783852, guid: 86ec63542882eb74fb3f8415b5833f31, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8007066915517783852, guid: 86ec63542882eb74fb3f8415b5833f31, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8007066915517783852, guid: 86ec63542882eb74fb3f8415b5833f31, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8007066915517783852, guid: 86ec63542882eb74fb3f8415b5833f31, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8007066915517783852, guid: 86ec63542882eb74fb3f8415b5833f31, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8007066915517783852, guid: 86ec63542882eb74fb3f8415b5833f31, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 86ec63542882eb74fb3f8415b5833f31, type: 3}
+--- !u!4 &144962211984505786 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8007066915517783852, guid: 86ec63542882eb74fb3f8415b5833f31, type: 3}
+  m_PrefabInstance: {fileID: 7862672189207127190}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7929126733153871004
 PrefabInstance:
