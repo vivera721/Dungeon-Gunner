@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class PauseMenuUI : MonoBehaviour
@@ -44,6 +45,14 @@ public class PauseMenuUI : MonoBehaviour
     private void OnDisable()
     {
         Time.timeScale = 1f;
+    }
+
+    /// <summary>
+    /// Quit and Load main menu - linked to from pause menu UI button
+    /// </summary>
+    public void LoadMainMenu()
+    {
+        SceneManager.LoadScene("MainMenuScene");
     }
 
     /// <summary>
